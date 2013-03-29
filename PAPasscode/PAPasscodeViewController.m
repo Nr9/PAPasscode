@@ -82,6 +82,7 @@
     view.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
 
     UINavigationBar *navigationBar = [[UINavigationBar alloc] initWithFrame:CGRectMake(0, 0, view.bounds.size.width, NAVBAR_HEIGHT)];
+	navigationBar.barStyle = UIBarStyleBlackOpaque;
     navigationBar.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     navigationBar.items = @[self.navigationItem];
     [view addSubview:navigationBar];
@@ -226,7 +227,14 @@
 }
 
 #pragma mark - implementation helpers
-
+-(BOOL)passcodeIsValid:(NSString *)canidate{
+	if ([_delegate respondsToSelector:@selector(PAPasscodeViewController:checkPasscodeValidityWithEntry:)])
+	{
+		return [_delegate PAPasscodeViewController:self checkPasscodeValidityWithEntry:canidate];
+	} else {
+		return [canidate isEqualToString:_passcode];
+	}
+}
 - (void)handleCompleteField {
     NSString *text = passcodeTextField.text;
     switch (_action) {
@@ -236,7 +244,8 @@
                 messageLabel.text = @"";
                 [self showScreenForPhase:1 animated:YES];
             } else {
-                if ([text isEqualToString:_passcode]) {
+                if ([text isEqualToString:_passcode]) 
+				{
                     if ([_delegate respondsToSelector:@selector(PAPasscodeViewControllerDidSetPasscode:)]) {
                         [_delegate PAPasscodeViewControllerDidSetPasscode:self];
                     }
@@ -248,7 +257,7 @@
             break;
             
         case PasscodeActionEnter:
-            if ([text isEqualToString:_passcode]) {
+			if ([self passcodeIsValid:text]){
                 [self resetFailedAttempts];
                 if (_success!=nil)
                 {
@@ -276,7 +285,12 @@
             
         case PasscodeActionChange:
             if (phase == 0) {
-                if ([text isEqualToString:_passcode]) {
+                if ((
+					[_delegate respondsToSelector:
+					 @selector(PAPasscodeViewController:checkPasscodeValidityWithEntry:)]) ?
+				   [_delegate PAPasscodeViewController:self checkPasscodeValidityWithEntry:text] :
+				   [text isEqualToString:_passcode])
+				{
                     [self resetFailedAttempts];
                     [self showScreenForPhase:1 animated:YES];
                 } else {
@@ -288,7 +302,8 @@
                 messageLabel.text = @"";
                 [self showScreenForPhase:2 animated:YES];
             } else {
-                if ([text isEqualToString:_passcode]) {
+                if ([text isEqualToString:_passcode])
+				{
                     if ([_delegate respondsToSelector:@selector(PAPasscodeViewControllerDidChangePasscode:)]) {
                         [_delegate PAPasscodeViewControllerDidChangePasscode:self];
                     }
