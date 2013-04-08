@@ -27,6 +27,18 @@
 #define SLIDE_DURATION  0.3
 
 @interface PAPasscodeViewController ()
+{
+    UIView *contentView;
+    NSInteger phase;
+    UILabel *promptLabel;
+    UILabel *messageLabel;
+    UIImageView *failedImageView;
+    UILabel *failedAttemptsLabel;
+    UITextField *passcodeTextField;
+    UIImageView *digitImageViews[4];
+    UIImageView *snapshotImageView;
+}
+
 - (void)cancel:(id)sender;
 - (void)handleFailedAttempt;
 - (void)handleCompleteField;

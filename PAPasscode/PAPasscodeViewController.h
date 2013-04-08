@@ -34,17 +34,7 @@ typedef BOOL (^ChallengeVerifyPasswordBlock)(NSString* entry);
 - (BOOL)PAPasscodeViewController:(PAPasscodeViewController *)controller checkPasscodeValidityWithEntry:(NSString *)entry;
 @end
 
-@interface PAPasscodeViewController : UIViewController {
-    UIView *contentView;
-    NSInteger phase;
-    UILabel *promptLabel;
-    UILabel *messageLabel;
-    UIImageView *failedImageView;
-    UILabel *failedAttemptsLabel;
-    UITextField *passcodeTextField;
-    UIImageView *digitImageViews[4];
-    UIImageView *snapshotImageView;
-}
+@interface PAPasscodeViewController : UIViewController 
 
 @property (strong) UIView *backgroundView;
 @property (readonly) PasscodeAction action;
