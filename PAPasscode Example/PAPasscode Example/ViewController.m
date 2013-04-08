@@ -29,7 +29,13 @@
         NSLog(@"Passcode entered correctly");
     } failure:^(NSInteger attempts) {
         NSLog(@"Passcode entered incorrectly %ld times", (long)attempts);
+    } cancel:^{
+        NSLog(@"Passcode chalenge canceled");
+    } verify:^BOOL(NSString *entry) {
+        NSLog(@"Using Block to validate password");
+        return [_passcodeLabel.text isEqualToString:entry];
     }];
+    
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
         passcodeViewController.backgroundView = [[UITableView alloc] initWithFrame:[UIScreen mainScreen].bounds style:UITableViewStyleGrouped];
     }

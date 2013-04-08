@@ -16,10 +16,12 @@ typedef enum {
 
 @class PAPasscodeViewController;
 
-@protocol PAPasscodeViewControllerDelegate <NSObject>
-
 typedef void (^ChallengeSucceedBlock)();
+typedef void (^ChallengeCanceledBlock)();
 typedef void (^ChallengeFailedBlock)(NSInteger attempts);
+typedef BOOL (^ChallengeVerifyPasswordBlock)(NSString* entry);
+
+@protocol PAPasscodeViewControllerDelegate <NSObject>
 
 @optional
 
@@ -57,9 +59,12 @@ typedef void (^ChallengeFailedBlock)(NSInteger attempts);
 @property (strong) NSString *message;
 @property (strong) ChallengeSucceedBlock success;
 @property (strong) ChallengeFailedBlock failure;
+@property (strong) ChallengeCanceledBlock cancel;
+@property (strong) ChallengeVerifyPasswordBlock verify;
 
-- (id)initForAction:(PasscodeAction)action;
 
-- (id)initForChallenge:(ChallengeSucceedBlock)success failure:(ChallengeFailedBlock)failure;
+- (instancetype)initForAction:(PasscodeAction)action;
+
+- (instancetype)initForChallenge:(ChallengeSucceedBlock)success failure:(ChallengeFailedBlock)failure cancel:(ChallengeCanceledBlock)cancel verify:(ChallengeVerifyPasswordBlock)verify;
 
 @end

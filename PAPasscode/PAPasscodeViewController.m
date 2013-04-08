@@ -38,7 +38,7 @@
 
 @implementation PAPasscodeViewController
 
-- (id)initForAction:(PasscodeAction)action {
+- (instancetype)initForAction:(PasscodeAction)action {
     self = [super init];
     if (self) {
         _action = action;
@@ -67,12 +67,14 @@
     return self;
 }
 
-- (id)initForChallenge:(ChallengeSucceedBlock)success failure:(ChallengeFailedBlock)failure
+- (instancetype)initForChallenge:(ChallengeSucceedBlock)success failure:(ChallengeFailedBlock)failure cancel:(ChallengeCanceledBlock)cancel verify:(ChallengeVerifyPasswordBlock)verify
 {
     self = [self initForAction:PasscodeActionEnter];
     if (self) {
         _success = success;
         _failure = failure;
+        _cancel = cancel;
+        _verify = verify;
     }
     return self;
 }
@@ -207,6 +209,14 @@
         }
     }
     
+    if (_cancel != nil) {
+        if (_simple) {
+            self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancel:)];
+        } else {
+            self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancel:)];
+        }
+    }
+    
     if (_failedAttempts > 0) {
         [self showFailedAttempts];
     }
@@ -223,7 +233,12 @@
 }
 
 - (void)cancel:(id)sender {
-    [_delegate PAPasscodeViewControllerDidCancel:self];
+    if ([_delegate respondsToSelector:@selector(PAPasscodeViewControllerDidCancel:)]) {
+        [_delegate PAPasscodeViewControllerDidCancel:self];
+    }
+    if (_cancel != nil){
+        _cancel();
+    }
 }
 
 #pragma mark - implementation helpers
@@ -231,10 +246,13 @@
 	if ([_delegate respondsToSelector:@selector(PAPasscodeViewController:checkPasscodeValidityWithEntry:)])
 	{
 		return [_delegate PAPasscodeViewController:self checkPasscodeValidityWithEntry:canidate];
-	} else {
+	} else if (_verify!= nil){
+        return _verify(canidate);
+    } else {
 		return [canidate isEqualToString:_passcode];
 	}
 }
+
 - (void)handleCompleteField {
     NSString *text = passcodeTextField.text;
     switch (_action) {
